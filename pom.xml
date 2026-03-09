@@ -12,7 +12,7 @@
 
     <name>SmartDBF</name>
     <description>Modern Java library for reading and processing DBF files</description>
-    <url>https://github.com/your-username/smart-dbf</url>
+    <url>https://github.com/vikaschaudharyarit-max/soturqkl9x.git</url>
 
     <licenses>
         <license>
@@ -26,14 +26,14 @@
             <name>Vikas Chaudhary</name>
             <email>vikaschaudhary432005@gmail.com</email>
             <organization>SmartDBF</organization>
-            <organizationUrl>https://github.com/your-username/smart-dbf</organizationUrl>
+            <organizationUrl>https://github.com/vikaschaudharyarit-max/soturqkl9x.git</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/your-username/smart-dbf.git</connection>
-        <developerConnection>scm:git:ssh://github.com:your-username/smart-dbf.git</developerConnection>
-        <url>https://github.com/your-username/smart-dbf</url>
+        <connection>scm:git:git://github.com/vikaschaudharyarit-max/soturqkl9x.git</connection>
+        <developerConnection>scm:git:ssh://github.com:vikaschaudharyarit-max/soturqkl9x.git</developerConnection>
+        <url>https://github.com/vikaschaudharyarit-max/soturqkl9x.git</url>
     </scm>
 
     <properties>
