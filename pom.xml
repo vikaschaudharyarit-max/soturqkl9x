@@ -41,9 +41,24 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Set to full path of gpg.exe on Windows if Maven cannot find gpg (e.g. -Dgpg.executable="C:\Program Files\Git\usr\bin\gpg.exe") -->
+        <!-- GPG: default 'gpg' for Linux/Mac. On Windows, profile below sets Git's gpg.exe; override with -Dgpg.executable=... if needed. -->
         <gpg.executable>gpg</gpg.executable>
     </properties>
+
+    <!-- On Windows, use Git for Windows gpg.exe by default (fixes "Could not determine gpg version") -->
+    <profiles>
+        <profile>
+            <id>windows-gpg</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <gpg.executable>C:/Program Files/Git/usr/bin/gpg.exe</gpg.executable>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
 
