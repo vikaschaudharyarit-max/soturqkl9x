@@ -1,8 +1,8 @@
-package io.smartdbf.mapper;
+package io.github.vikaschaudharyarit_max.smartdbf.mapper;
 
-import io.smartdbf.core.DbfReader;
-import io.smartdbf.schema.DbfField;
-import io.smartdbf.annotation.DbfColumn;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
+import io.github.vikaschaudharyarit_max.smartdbf.schema.DbfField;
+import io.github.vikaschaudharyarit_max.smartdbf.annotation.DbfColumn;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

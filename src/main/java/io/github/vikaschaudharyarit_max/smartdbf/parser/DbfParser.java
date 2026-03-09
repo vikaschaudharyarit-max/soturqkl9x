@@ -1,6 +1,6 @@
-package io.smartdbf.parser;
+package io.github.vikaschaudharyarit_max.smartdbf.parser;
 
-import io.smartdbf.schema.*;
+import io.github.vikaschaudharyarit_max.smartdbf.schema.*;
 
 import java.io.InputStream;
 import java.util.ArrayList;

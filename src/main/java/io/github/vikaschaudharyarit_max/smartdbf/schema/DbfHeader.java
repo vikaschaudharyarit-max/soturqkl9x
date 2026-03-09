@@ -1,4 +1,4 @@
-package io.smartdbf.schema;
+package io.github.vikaschaudharyarit_max.smartdbf.schema;
 
 public class DbfHeader {
 

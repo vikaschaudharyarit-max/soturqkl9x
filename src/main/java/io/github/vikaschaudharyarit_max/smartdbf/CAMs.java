@@ -1,8 +1,8 @@
-package io.smartdbf;
+package io.github.vikaschaudharyarit_max.smartdbf;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import io.smartdbf.annotation.DbfColumn;
+import io.github.vikaschaudharyarit_max.smartdbf.annotation.DbfColumn;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package io.smartdbf.exception;
+package io.github.vikaschaudharyarit_max.smartdbf.exception;
 
 public class DbfException extends RuntimeException {
 

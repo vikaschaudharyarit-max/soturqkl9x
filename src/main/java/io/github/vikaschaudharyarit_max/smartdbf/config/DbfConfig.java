@@ -1,4 +1,4 @@
-package io.smartdbf.config;
+package io.github.vikaschaudharyarit_max.smartdbf.config;
 
 public class DbfConfig {
 

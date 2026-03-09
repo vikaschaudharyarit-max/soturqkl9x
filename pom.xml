@@ -5,9 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.smartdbf</groupId>
+    <groupId>io.github.vikaschaudharyarit-max</groupId>
     <artifactId>smart-dbf</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>SmartDBF</name>
@@ -43,6 +43,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- GPG: default 'gpg' for Linux/Mac. On Windows, profile below sets Git's gpg.exe; override with -Dgpg.executable=... if needed. -->
         <gpg.executable>gpg</gpg.executable>
+        <!-- Key used for signing (the one you published to keyserver and imported on Windows). Override with -Dgpg.keyname=... -->
+        <gpg.keyname>8A43027C56C5542DFA7CB2694A1117ACF0155128</gpg.keyname>
     </properties>
 
     <!-- On Windows, use Git for Windows gpg.exe by default (fixes "Could not determine gpg version") -->
@@ -75,6 +77,18 @@
             <artifactId>lombok</artifactId>
             <version>1.18.32</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Spring (for RestTemplateConfig: @Configuration, @Bean, RestTemplate) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>6.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>6.1.6</version>
         </dependency>
 
         <!-- Testing -->
@@ -139,6 +153,9 @@
                         </goals>
                         <configuration>
                             <executable>${gpg.executable}</executable>
+                            <!-- Use the key you imported (override with -Dgpg.keyname=YOUR_KEY_ID if different) -->
+                            <keyname>${gpg.keyname}</keyname>
+                            <!-- loopback = read passphrase from stdin (no TTY needed); set MAVEN_GPG_PASSPHRASE in PowerShell -->
                             <gpgArguments>
                                 <arg>--pinentry-mode</arg>
                                 <arg>loopback</arg>

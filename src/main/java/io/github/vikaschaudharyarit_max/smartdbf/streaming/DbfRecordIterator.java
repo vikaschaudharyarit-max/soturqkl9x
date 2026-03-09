@@ -1,6 +1,6 @@
-package io.smartdbf.streaming;
+package io.github.vikaschaudharyarit_max.smartdbf.streaming;
 
-import io.smartdbf.core.DbfReader;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
 
 import java.util.Iterator;
 

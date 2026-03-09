@@ -63,6 +63,11 @@ Desktop.ini
 *.swp
 *~
 
+# GPG secret key export (never commit)
+*-gpg-key.asc
+*.asc
+!**/src/test/resources/**/*.asc
+
 # Test / temporary
 *.dbf
 !**/src/test/resources/**/*.dbf

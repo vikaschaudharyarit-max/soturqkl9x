@@ -1,13 +1,13 @@
-package io.smartdbf.core;
+package io.github.vikaschaudharyarit_max.smartdbf.core;
 
-import io.smartdbf.parser.DbfParser;
-import io.smartdbf.schema.*;
-import io.smartdbf.streaming.DbfRecordIterator;
+import io.github.vikaschaudharyarit_max.smartdbf.parser.DbfParser;
+import io.github.vikaschaudharyarit_max.smartdbf.schema.*;
+import io.github.vikaschaudharyarit_max.smartdbf.streaming.DbfRecordIterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.Spliterators;
 import java.util.Spliterator;
-import io.smartdbf.mapper.DbfMapper;
+import io.github.vikaschaudharyarit_max.smartdbf.mapper.DbfMapper;
 import java.util.ArrayList;
 import java.util.List;
 

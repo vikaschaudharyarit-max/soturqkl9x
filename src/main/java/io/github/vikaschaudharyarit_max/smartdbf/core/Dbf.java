@@ -1,6 +1,6 @@
-package io.smartdbf.core;
+package io.github.vikaschaudharyarit_max.smartdbf.core;
 
-import io.smartdbf.exception.DbfException;
+import io.github.vikaschaudharyarit_max.smartdbf.exception.DbfException;
 
 import java.io.*;
 

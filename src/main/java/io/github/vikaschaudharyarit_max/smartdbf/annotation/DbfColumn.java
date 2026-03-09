@@ -1,4 +1,4 @@
-package io.smartdbf.annotation;
+package io.github.vikaschaudharyarit_max.smartdbf.annotation;
 
 import java.lang.annotation.*;
 

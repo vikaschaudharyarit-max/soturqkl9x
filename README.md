@@ -30,7 +30,7 @@ Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>io.smartdbf</groupId>
+    <groupId>io.github.vikaschaudharyarit-max</groupId>
     <artifactId>smart-dbf</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -39,13 +39,13 @@ Add the following dependency to your `pom.xml`:
 ### Gradle (Groovy)
 
 ```groovy
-implementation 'io.smartdbf:smart-dbf:1.0.0'
+implementation 'io.github.vikaschaudharyarit-max:smart-dbf:1.0.0'
 ```
 
 ### Gradle (Kotlin DSL)
 
 ```kotlin
-implementation("io.smartdbf:smart-dbf:1.0.0")
+implementation("io.github.vikaschaudharyarit-max:smart-dbf:1.0.0")
 ```
 
 ---
@@ -53,8 +53,8 @@ implementation("io.smartdbf:smart-dbf:1.0.0")
 ## Quick Start
 
 ```java
-import io.smartdbf.core.Dbf;
-import io.smartdbf.core.DbfReader;
+import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
 
 DbfReader reader = Dbf.open("/path/to/file.dbf");
 
@@ -77,8 +77,8 @@ reader.close();
 ### 1. Opening a DBF file
 
 ```java
-import io.smartdbf.core.Dbf;
-import io.smartdbf.core.DbfReader;
+import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
 
 DbfReader reader = Dbf.open("data.dbf");
 try {
@@ -146,7 +146,7 @@ Define a class with fields that match DBF column names (case-insensitive). Use `
 **Example entity:**
 
 ```java
-import io.smartdbf.annotation.DbfColumn;
+import io.github.vikaschaudharyarit_max.smartdbf.annotation.DbfColumn;
 
 public class Transaction {
     @DbfColumn("FOLIO_NO")

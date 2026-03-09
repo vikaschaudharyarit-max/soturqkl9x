@@ -1,5 +1,5 @@
-import io.smartdbf.core.Dbf;
-import io.smartdbf.core.DbfReader;
+import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package io.smartdbf.mapper;
+package io.github.vikaschaudharyarit_max.smartdbf.mapper;
 
 import java.lang.reflect.Field;
 
