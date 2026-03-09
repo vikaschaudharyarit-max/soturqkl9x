@@ -41,6 +41,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Set to full path of gpg.exe on Windows if Maven cannot find gpg (e.g. -Dgpg.executable="C:\Program Files\Git\usr\bin\gpg.exe") -->
+        <gpg.executable>gpg</gpg.executable>
     </properties>
 
     <dependencies>
@@ -121,6 +123,7 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
+                            <executable>${gpg.executable}</executable>
                             <gpgArguments>
                                 <arg>--pinentry-mode</arg>
                                 <arg>loopback</arg>
