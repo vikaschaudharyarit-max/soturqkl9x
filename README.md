@@ -4,6 +4,39 @@ A modern Java library for **reading and processing DBF (dBASE) files**. SmartDBF
 
 ---
 
+## How to use in your project
+
+**1. Add the dependency** (Maven):
+
+```xml
+<dependency>
+    <groupId>io.github.vikaschaudharyarit-max</groupId>
+    <artifactId>smart-dbf</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+**Gradle:** `implementation 'io.github.vikaschaudharyarit-max:smart-dbf:1.0.0'`
+
+**2. In your Java code:**
+
+```java
+import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
+
+// Open a DBF file and read records
+DbfReader reader = Dbf.open("/path/to/your/file.dbf");
+while (reader.hasNext()) {
+    Object[] record = reader.nextRecord();
+    // use record...
+}
+reader.close();
+```
+
+That’s it. For **streaming**, **schema inspection**, or **mapping to POJOs** with `@DbfColumn`, see the sections below.
+
+---
+
 ## Features
 
 - **Simple API** — Open a DBF file with a single call: `Dbf.open(path)`
@@ -89,6 +122,45 @@ try {
 ```
 
 `Dbf.open(String path)` opens the file and parses the header and schema. If the file cannot be opened or parsed, a `DbfException` is thrown.
+
+**Note:** `Dbf.open(String path)` only supports **local file paths**. It does not accept `s3://` URIs. To read from AWS S3 (or any other source), use `Dbf.open(InputStream)` (see below).
+
+---
+
+### 1b. Opening from a stream (e.g. AWS S3)
+
+Use `Dbf.open(InputStream)` when the DBF content comes from S3, HTTP, or any stream. You supply the stream; the library reads from it.
+
+**Example: reading a DBF file from AWS S3**
+
+```java
+import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
+import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+
+// In your code (S3Client is from your AWS config):
+String bucket = "mfbo-rta-files-dev-01674cbd";
+String key = "karvy/2026/02/18/W0T7239.dbf";
+
+try (ResponseInputStream<GetObjectResponse> s3Stream = s3Client.getObject(
+        GetObjectRequest.builder().bucket(bucket).key(key).build())) {
+
+    DbfReader reader = Dbf.open(s3Stream);
+    try {
+        while (reader.hasNext()) {
+            Object[] record = reader.nextRecord();
+            // process record...
+        }
+    } finally {
+        reader.close();
+    }
+}
+```
+
+Your project must have the AWS SDK dependency (e.g. `software.amazon.awssdk:s3`). SmartDBF does not depend on AWS; it only needs an `InputStream`.
 
 ---
 
