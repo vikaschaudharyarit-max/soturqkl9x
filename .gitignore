@@ -71,3 +71,5 @@ Desktop.ini
 # Test / temporary
 *.dbf
 !**/src/test/resources/**/*.dbf
+.crt
+.asc
