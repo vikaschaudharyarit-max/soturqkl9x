@@ -326,18 +326,6 @@ To skip tests (e.g. if tests use local file paths):
 mvn clean install -DskipTests
 ```
 
----
-
-## Publishing to Maven Central
-
-This project is set up for publishing to Maven Central. See **[MAVEN_CENTRAL_PUBLISHING.md](MAVEN_CENTRAL_PUBLISHING.md)** for:
-
-- Sonatype Central account and namespace
-- GPG signing
-- Token configuration and `mvn deploy`
-
----
-
 ## License
 
 This project is licensed under the **Apache License, Version 2.0**. See the [LICENSE](LICENSE) file or [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0) for details.
