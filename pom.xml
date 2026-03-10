@@ -7,11 +7,11 @@
 
     <groupId>io.github.vikaschaudharyarit-max</groupId>
     <artifactId>smart-dbf</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>SmartDBF</name>
-    <description>Modern Java library for reading and processing DBF files</description>
+    <description>Modern Java library for reading and processing DBF (dBASE) files — supports streaming, POJO mapping, charset configuration, and AWS S3</description>
     <url>https://github.com/vikaschaudharyarit-max/soturqkl9x.git</url>
 
     <licenses>
@@ -41,20 +41,16 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- GPG: default 'gpg' for Linux/Mac. On Windows, profile below sets Git's gpg.exe; override with -Dgpg.executable=... if needed. -->
         <gpg.executable>gpg</gpg.executable>
-        <!-- Key used for signing (the one you published to keyserver and imported on Windows). Override with -Dgpg.keyname=... -->
         <gpg.keyname>8A43027C56C5542DFA7CB2694A1117ACF0155128</gpg.keyname>
     </properties>
 
-    <!-- On Windows, use Git for Windows gpg.exe by default (fixes "Could not determine gpg version") -->
+    <!-- On Windows, use Git for Windows gpg.exe -->
     <profiles>
         <profile>
             <id>windows-gpg</id>
             <activation>
-                <os>
-                    <family>windows</family>
-                </os>
+                <os><family>windows</family></os>
             </activation>
             <properties>
                 <gpg.executable>C:/Program Files/Git/usr/bin/gpg.exe</gpg.executable>
@@ -64,14 +60,14 @@
 
     <dependencies>
 
-        <!-- Logging -->
+        <!-- Logging facade — consumers provide the implementation (logback, log4j2, etc.) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.9</version>
         </dependency>
 
-        <!-- Lombok (optional but helpful) -->
+        <!-- Lombok for cleaner code — compile-time only, not bundled in the JAR -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -79,23 +75,19 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Spring (for RestTemplateConfig: @Configuration, @Bean, RestTemplate) -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>6.1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>6.1.6</version>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SLF4J simple logger for test output only -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
             <scope>test</scope>
         </dependency>
 
@@ -139,7 +131,7 @@
                 </executions>
             </plugin>
 
-            <!-- GPG signing (required by Maven Central) -->
+            <!-- GPG signing — version 1.6 is the reliable choice on Windows -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>

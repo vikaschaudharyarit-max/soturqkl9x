@@ -1,6 +1,6 @@
 # SmartDBF
 
-A modern Java library for **reading and processing DBF (dBASE) files**. SmartDBF provides a simple, type-safe API with support for streaming, schema introspection, and mapping records to Java objects via annotations.
+A modern Java library for **reading and processing DBF (dBASE) files**. SmartDBF provides a simple, type-safe API with support for streaming, schema introspection, charset configuration, and mapping records directly to Java objects via annotations.
 
 ---
 
@@ -12,11 +12,13 @@ A modern Java library for **reading and processing DBF (dBASE) files**. SmartDBF
 <dependency>
     <groupId>io.github.vikaschaudharyarit-max</groupId>
     <artifactId>smart-dbf</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
-**Gradle:** `implementation 'io.github.vikaschaudharyarit-max:smart-dbf:1.0.0'`
+**Gradle (Groovy):** `implementation 'io.github.vikaschaudharyarit-max:smart-dbf:1.1.0'`
+
+**Gradle (Kotlin DSL):** `implementation("io.github.vikaschaudharyarit-max:smart-dbf:1.1.0")`
 
 **2. In your Java code:**
 
@@ -24,323 +26,295 @@ A modern Java library for **reading and processing DBF (dBASE) files**. SmartDBF
 import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
 import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
 
-// Open a DBF file and read records
-DbfReader reader = Dbf.open("/path/to/your/file.dbf");
-while (reader.hasNext()) {
-    Object[] record = reader.nextRecord();
-    // use record...
+// try-with-resources ensures the file is always closed
+try (DbfReader reader = Dbf.open("/path/to/your/file.dbf")) {
+    while (reader.hasNext()) {
+        Object[] record = reader.nextRecord();
+        // process record...
+    }
 }
-reader.close();
 ```
 
-That’s it. For **streaming**, **schema inspection**, or **mapping to POJOs** with `@DbfColumn`, see the sections below.
+That's it. For **streaming**, **schema inspection**, **charset configuration**, or **mapping to POJOs** with `@DbfColumn`, see the sections below.
 
 ---
 
 ## Features
 
-- **Simple API** — Open a DBF file with a single call: `Dbf.open(path)`
-- **Schema introspection** — Access field names, types, and metadata without reading all data
-- **Streaming support** — Process large files with `stream()` without loading everything into memory
-- **POJO mapping** — Map records to Java classes using `@DbfColumn` for flexible column binding
-- **Type conversion** — Automatic handling of Character (C), Numeric (N), Logical (L), and Date (D) fields
-- **Java 17+** — Built for modern Java with `Stream` and clean APIs
-- **Minimal dependencies** — Only SLF4J for logging; no heavy runtime dependencies
+- **Simple API** — Open any DBF file with a single call: `Dbf.open(path)`
+- **try-with-resources** — `DbfReader` implements `AutoCloseable`; no manual `close()` needed
+- **Schema introspection** — Inspect field names, types, and lengths without reading records: `Dbf.schema(path)`
+- **Streaming** — Process large files lazily with `reader.stream()` without loading all records into memory
+- **POJO mapping** — Map records to Java classes using `@DbfColumn` for flexible, annotation-driven binding
+- **Automatic type conversion** — DBF fields converted to proper Java types:
+  - `C` (Character) → `String`
+  - `N`/`F` (Numeric/Float) → `BigDecimal` (preserves decimal precision)
+  - `D` (Date) → `java.time.LocalDate`
+  - `L` (Logical) → `Boolean`
+- **Smart type coercion in POJO mapper** — Automatically converts `BigDecimal` to `Double`, `Long`, `Integer`, etc. to match your field types
+- **Charset support** — Specify encoding for legacy DBF files: `Dbf.open(path, Charset.forName("CP1252"))`
+- **InputStream support** — Read from AWS S3, HTTP, or any stream with `Dbf.open(InputStream)`
+- **Configurable buffer size** — Tune I/O performance via `DbfConfig`
+- **SLF4J logging** — Debug-level logging throughout; bring your own implementation (Logback, Log4j2, etc.)
+- **Minimal dependencies** — Only `slf4j-api`; no Spring, no heavy transitive dependencies
+- **Java 17+** — Uses modern Java idioms (`Stream`, `LocalDate`, records, pattern matching)
 
 ---
 
 ## Requirements
 
 - **Java 17** or higher
-
----
-
-## Installation
-
-### Maven
-
-Add the following dependency to your `pom.xml`:
-
-```xml
-<dependency>
-    <groupId>io.github.vikaschaudharyarit-max</groupId>
-    <artifactId>smart-dbf</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```
-
-### Gradle (Groovy)
-
-```groovy
-implementation 'io.github.vikaschaudharyarit-max:smart-dbf:1.0.0'
-```
-
-### Gradle (Kotlin DSL)
-
-```kotlin
-implementation("io.github.vikaschaudharyarit-max:smart-dbf:1.0.0")
-```
-
----
-
-## Quick Start
-
-```java
-import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
-import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
-
-DbfReader reader = Dbf.open("/path/to/file.dbf");
-
-// Inspect schema
-System.out.println(reader.getSchema());
-
-// Read records one by one
-while (reader.hasNext()) {
-    Object[] record = reader.nextRecord();
-    // record[i] corresponds to schema.getFields().get(i)
-}
-
-reader.close();
-```
+- No other required runtime dependencies
 
 ---
 
 ## Usage
 
-### 1. Opening a DBF file
+### 1. Opening a DBF file (local path)
 
 ```java
-import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
-import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
-
-DbfReader reader = Dbf.open("data.dbf");
-try {
-    // use reader
-} finally {
-    reader.close();
+try (DbfReader reader = Dbf.open("data.dbf")) {
+    while (reader.hasNext()) {
+        Object[] row = reader.nextRecord();
+        // row[i] corresponds to schema.getFields().get(i)
+    }
 }
 ```
 
-`Dbf.open(String path)` opens the file and parses the header and schema. If the file cannot be opened or parsed, a `DbfException` is thrown.
-
-**Note:** `Dbf.open(String path)` only supports **local file paths**. It does not accept `s3://` URIs. To read from AWS S3 (or any other source), use `Dbf.open(InputStream)` (see below).
+If the file cannot be opened or the header cannot be parsed, a `DbfException` (unchecked) is thrown.
 
 ---
 
-### 1b. Opening from a stream (e.g. AWS S3)
+### 2. Inspecting the schema
 
-Use `Dbf.open(InputStream)` when the DBF content comes from S3, HTTP, or any stream. You supply the stream; the library reads from it.
-
-**Example: reading a DBF file from AWS S3**
+Inspect file structure without reading any records:
 
 ```java
-import io.github.vikaschaudharyarit_max.smartdbf.core.Dbf;
-import io.github.vikaschaudharyarit_max.smartdbf.core.DbfReader;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+// From a path — no records are read
+DbfSchema schema = Dbf.schema("data.dbf");
 
-// In your code (S3Client is from your AWS config):
-String bucket = "mfbo-rta-files-dev-01674cbd";
-String key = "karvy/2026/02/18/W0T7239.dbf";
+System.out.printf("%-15s %-6s %-8s %-10s%n", "Field", "Type", "Length", "Decimals");
+for (DbfField field : schema.getFields()) {
+    System.out.printf("%-15s %-6s %-8d %-10d%n",
+            field.getName(), field.getType(), field.getLength(), field.getDecimalCount());
+}
+```
 
-try (ResponseInputStream<GetObjectResponse> s3Stream = s3Client.getObject(
-        GetObjectRequest.builder().bucket(bucket).key(key).build())) {
+Example output:
 
-    DbfReader reader = Dbf.open(s3Stream);
-    try {
-        while (reader.hasNext()) {
-            Object[] record = reader.nextRecord();
-            // process record...
+```
+Field           Type   Length   Decimals
+AMC_CODE        C      3        0
+FOLIO_NO        C      20       0
+AMOUNT          N      19       2
+TRADDATE        D      8        0
+ACTIVE          L      1        0
+```
+
+You can also get the schema from an open reader: `reader.getSchema()`.
+
+---
+
+### 3. Reading records as `Object[]`
+
+Field values are returned in schema order. Types are converted automatically:
+
+
+| DBF Type                | Java Type              |
+| ----------------------- | ---------------------- |
+| C (Character)           | `String`               |
+| N / F (Numeric / Float) | `java.math.BigDecimal` |
+| D (Date, yyyyMMdd)      | `java.time.LocalDate`  |
+| L (Logical)             | `Boolean`              |
+| Any other               | `String`               |
+| Empty / blank           | `null`                 |
+
+
+```java
+try (DbfReader reader = Dbf.open("data.dbf")) {
+    DbfSchema schema = reader.getSchema();
+    while (reader.hasNext()) {
+        Object[] row = reader.nextRecord();
+        for (int i = 0; i < row.length; i++) {
+            System.out.println(schema.getFields().get(i).getName() + " = " + row[i]);
         }
-    } finally {
-        reader.close();
     }
 }
 ```
 
-Your project must have the AWS SDK dependency (e.g. `software.amazon.awssdk:s3`). SmartDBF does not depend on AWS; it only needs an `InputStream`.
+Deleted records (marked with `*` internally) are skipped automatically.
 
 ---
 
-### 2. Reading records as `Object[]`
+### 4. Streaming records
 
-Each record is returned as an array of objects aligned with the schema field order. Types are converted automatically:
-
-| DBF Type | Java type / value |
-|----------|-------------------|
-| C (Character) | `String` |
-| N (Numeric)   | `Double` or `null` |
-| L (Logical)  | `Boolean` (Y/T → true) |
-| D (Date)     | `String` (raw) |
+For large files, `stream()` processes records lazily without loading everything into memory:
 
 ```java
-DbfReader reader = Dbf.open("data.dbf");
-DbfSchema schema = reader.getSchema();
-
-while (reader.hasNext()) {
-    Object[] row = reader.nextRecord();
-    for (int i = 0; i < row.length; i++) {
-        String fieldName = schema.getFields().get(i).getName();
-        Object value = row[i];
-        System.out.println(fieldName + " = " + value);
-    }
+try (DbfReader reader = Dbf.open("large.dbf")) {
+    reader.stream()
+          .filter(row -> row[2] != null)
+          .limit(1000)
+          .forEach(row -> System.out.println(Arrays.toString(row)));
 }
-reader.close();
 ```
+
+The stream closes the reader automatically when the terminal operation completes.
 
 ---
 
-### 3. Streaming records
+### 5. Mapping records to POJOs
 
-For large files, use `stream()` to process records without loading all into memory:
-
-```java
-DbfReader reader = Dbf.open("large.dbf");
-
-reader.stream()
-    .filter(row -> row[2] != null)
-    .limit(1000)
-    .forEach(row -> System.out.println(Arrays.toString(row)));
-
-reader.close();
-```
-
-The stream is configured with `onClose(reader::close)`, so when the stream is consumed or closed, the underlying reader is closed. Always close the reader when you are done (or consume the stream fully).
-
----
-
-### 4. Mapping to Java objects (POJOs)
-
-Define a class with fields that match DBF column names (case-insensitive). Use `@DbfColumn("DBF_COLUMN_NAME")` when the Java field name differs from the column name.
-
-**Example entity:**
+Define a POJO with `@DbfColumn` annotations to bind fields to DBF columns by name (case-insensitive):
 
 ```java
 import io.github.vikaschaudharyarit_max.smartdbf.annotation.DbfColumn;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class Transaction {
-    @DbfColumn("FOLIO_NO")
-    private String folioNo;
 
-    @DbfColumn("SCHEME")
-    private String scheme;
+    @DbfColumn("FOLIO_NO")  private String    folioNo;
+    @DbfColumn("SCHEME")    private String    scheme;
+    @DbfColumn("AMOUNT")    private BigDecimal amount;
+    @DbfColumn("TRADDATE")  private LocalDate tradeDate;
+    @DbfColumn("UNITS")     private BigDecimal units;
 
-    @DbfColumn("AMOUNT")
-    private Double amount;
+    public Transaction() {} // required no-arg constructor
 
-    @DbfColumn("TRADDATE")
-    private String tradeDate;
-
-    // Default constructor required for mapping
-    public Transaction() {}
-
-    // Getters and setters
-    public String getFolioNo() { return folioNo; }
-    public void setFolioNo(String folioNo) { this.folioNo = folioNo; }
-    public String getScheme() { return scheme; }
-    public void setScheme(String scheme) { this.scheme = scheme; }
-    public Double getAmount() { return amount; }
-    public void setAmount(Double amount) { this.amount = amount; }
-    public String getTradeDate() { return tradeDate; }
-    public void setTradeDate(String tradeDate) { this.tradeDate = tradeDate; }
+    // getters...
 }
 ```
 
 **Read all into a list:**
 
 ```java
-DbfReader reader = Dbf.open("transactions.dbf");
-List<Transaction> list = reader.read(Transaction.class);
-reader.close();
+try (DbfReader reader = Dbf.open("transactions.dbf")) {
+    List<Transaction> txns = reader.read(Transaction.class);
+}
 ```
 
-**Stream as mapped objects:**
+**Stream as typed objects:**
 
 ```java
-DbfReader reader = Dbf.open("transactions.dbf");
-reader.stream(Transaction.class)
-    .filter(t -> t.getAmount() != null && t.getAmount() > 1000)
-    .forEach(t -> System.out.println(t.getFolioNo() + " " + t.getAmount()));
-reader.close();
+try (DbfReader reader = Dbf.open("transactions.dbf")) {
+    reader.stream(Transaction.class)
+          .filter(t -> t.getAmount() != null && t.getAmount().compareTo(BigDecimal.valueOf(1000)) > 0)
+          .forEach(t -> System.out.println(t.getFolioNo() + " " + t.getAmount()));
+}
 ```
 
-Mapping rules:
+**Mapping rules:**
 
-- **Column name:** If a field has `@DbfColumn("NAME")`, the mapper uses that name; otherwise it uses the Java field name.
-- **Matching:** DBF column names are matched case-insensitively to the name (from annotation or field).
-- **No-arg constructor:** The target class must have a public no-argument constructor.
-- **Unmatched columns:** DBF columns with no matching field are ignored. Fields with no matching column are left at default values.
+- If a Java field has `@DbfColumn("NAME")`, that column name is used for lookup; otherwise the Java field name is used.
+- DBF column names are matched **case-insensitively**.
+- The target class must have a **public no-arg constructor** (works with Lombok `@NoArgsConstructor`).
+- Unmatched columns are ignored; unmatched Java fields keep their default values.
+- **Automatic type coercion:** `BigDecimal` → `Double`/`Long`/`Integer`/`Float`; `LocalDate` → `java.sql.Date`/`java.util.Date`; etc.
 
 ---
 
-### 5. Schema and field metadata
+### 6. Opening from an InputStream (e.g. AWS S3)
+
+Use `Dbf.open(InputStream)` when the DBF content comes from a remote source. SmartDBF does not depend on AWS — it only needs a standard `InputStream`.
 
 ```java
-DbfReader reader = Dbf.open("data.dbf");
-DbfSchema schema = reader.getSchema();
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
-for (DbfField field : schema.getFields()) {
-    String name = field.getName();
-    char type = field.getType();   // C, N, L, D, etc.
-    int length = field.getLength();
-    int decimals = field.getDecimalCount();
-    System.out.println(name + " " + type + " " + length);
+String bucket = "my-bucket";
+String key    = "data/transactions.dbf";
+
+try (var s3Stream = s3Client.getObject(
+        GetObjectRequest.builder().bucket(bucket).key(key).build());
+     DbfReader reader = Dbf.open(s3Stream)) {
+
+    reader.stream(Transaction.class)
+          .forEach(System.out::println);
 }
 ```
 
 ---
 
-## API overview
+### 7. Charset / encoding support
 
-| Class / interface | Description |
-|-------------------|-------------|
-| `Dbf` | Entry point; `Dbf.open(String path)` returns a `DbfReader`. |
-| `DbfReader` | Reads records, provides `getSchema()`, `hasNext()`, `nextRecord()`, `stream()`, `read(Class)`, `stream(Class)`, `close()`. |
-| `DbfSchema` | List of `DbfField`; describes the structure of the DBF file. |
-| `DbfField` | Field name, type (char), length, decimal count. |
-| `DbfMapper<T>` | Used internally; maps `Object[]` rows to instances of `T` using `@DbfColumn`. |
-| `@DbfColumn("NAME")` | Annotation on a field to bind it to the DBF column `NAME`. |
-| `DbfException` | RuntimeException thrown on open/parse errors. |
+Many legacy DBF files produced on Windows use `CP1252` (Western European) or other regional encodings. Specify the charset explicitly:
+
+```java
+import java.nio.charset.Charset;
+
+// CP1252 (common for Windows-generated DBF files)
+try (DbfReader reader = Dbf.open("legacy.dbf", Charset.forName("CP1252"))) {
+    reader.stream().forEach(row -> System.out.println(Arrays.toString(row)));
+}
+
+// ISO-8859-1
+try (DbfReader reader = Dbf.open(s3Stream, Charset.forName("ISO-8859-1"))) {
+    List<MyRecord> records = reader.read(MyRecord.class);
+}
+```
+
+Default encoding is **UTF-8**.
+
+---
+
+### 8. Custom buffer size (performance tuning)
+
+For very large files on slow storage (NFS, S3-backed mounts), increase the read buffer:
+
+```java
+import io.github.vikaschaudharyarit_max.smartdbf.config.DbfConfig;
+import java.nio.charset.StandardCharsets;
+
+DbfConfig config = new DbfConfig.Builder()
+        .bufferSize(524288) // 512 KB
+        .build();
+
+try (DbfReader reader = Dbf.open("huge.dbf", StandardCharsets.UTF_8, config)) {
+    reader.stream().forEach(row -> process(row));
+}
+```
+
+Default buffer size is **64 KB**.
+
+---
+
+## API Reference
+
+
+| Class                | Description                                                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dbf`                | Entry point. Static factory methods: `open(path)`, `open(path, charset)`, `open(path, charset, config)`, `open(InputStream)`, `open(InputStream, charset)`, `schema(path)`, `schema(InputStream)` |
+| `DbfReader`          | Reads records. `hasNext()`, `nextRecord()`, `stream()`, `read(Class)`, `stream(Class)`, `getSchema()`, `close()`. Implements `AutoCloseable`.                                                     |
+| `DbfSchema`          | The list of `DbfField`s describing the file structure.                                                                                                                                            |
+| `DbfField`           | One column: `getName()`, `getType()` (char: C/N/D/L/…), `getLength()`, `getDecimalCount()`                                                                                                        |
+| `DbfConfig`          | I/O tuning. Built via `new DbfConfig.Builder().bufferSize(n).build()`.                                                                                                                            |
+| `@DbfColumn("NAME")` | Annotation on a POJO field. Binds it to the DBF column `NAME`.                                                                                                                                    |
+| `DbfException`       | Unchecked exception thrown on open / parse / read failures.                                                                                                                                       |
+
 
 ---
 
 ## Building from source
 
 ```bash
-git clone https://github.com/your-username/smart-dbf.git
+git clone https://github.com/vikaschaudharyarit-max/smart-dbf.git
 cd smart-dbf
 mvn clean install
 ```
 
-To run tests:
+Run tests only:
 
 ```bash
 mvn test
 ```
 
-To skip tests (e.g. if tests use local file paths):
+Tests are fully self-contained — no external files or machine-specific paths are needed.
 
-```bash
-mvn clean install -DskipTests
-```
-
----
-
-## Publishing to Maven Central
-
-This project is set up for publishing to Maven Central. See **[MAVEN_CENTRAL_PUBLISHING.md](MAVEN_CENTRAL_PUBLISHING.md)** for:
-
-- Sonatype Central account and namespace
-- GPG signing
-- Token configuration and `mvn deploy`
-
----
 
 ## License
 
-This project is licensed under the **Apache License, Version 2.0**. See the [LICENSE](LICENSE) file or [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0) for details.
+Apache License, Version 2.0 — see [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ---
 
